@@ -7,10 +7,12 @@
     <meta name="description" content="Simple tool to build and share a guitar scale.">
     <style type="text/css">
         .scale-note {
-            display: inline-block;
+            display: inline;
             padding: 5px;
+            width: 10px;
             border: 1px solid #ccc;
             border-radius: 2px;
+            margin-right: 3px;
         }
         .scale-note:hover {
             border-color: #666;
@@ -44,18 +46,18 @@
             <p>This tool allows you to build your own guitar scale.<br/> Click on the notes to change the current scale. Active notes have a light green background.</p>
         </section>
         <div class="scale-picker">
-            <div class="scale-note" data-note="c">c</div>
-            <div class="scale-note" data-note="c#">c#</div>
-            <div class="scale-note" data-note="d">d</div>
-            <div class="scale-note" data-note="d#">d#</div>
-            <div class="scale-note" data-note="e">e</div>
-            <div class="scale-note" data-note="f">f</div>
-            <div class="scale-note" data-note="f#">f#</div>
-            <div class="scale-note" data-note="g">g</div>
-            <div class="scale-note" data-note="g#">g#</div>
-            <div class="scale-note" data-note="a">a</div>
-            <div class="scale-note" data-note="a#">a#</div>
-            <div class="scale-note" data-note="b">b</div>
+            <span class="scale-note" data-note="c">c</span>
+            <span class="scale-note" data-note="c#">c#</span>
+            <span class="scale-note" data-note="d">d</span>
+            <span class="scale-note" data-note="d#">d#</span>
+            <span class="scale-note" data-note="e">e</span>
+            <span class="scale-note" data-note="f">f</span>
+            <span class="scale-note" data-note="f#">f#</span>
+            <span class="scale-note" data-note="g">g</span>
+            <span class="scale-note" data-note="g#">g#</span>
+            <span class="scale-note" data-note="a">a</span>
+            <span class="scale-note" data-note="a#">a#</span>
+            <span class="scale-note" data-note="b">b</span>
         </div>
 
         <pre id="board"></pre>
