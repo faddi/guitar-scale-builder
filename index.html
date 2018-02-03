@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Guitar scale builder</title>
+    <meta name="description" content="Simple tool to build and share a guitar scale.">
+    <style type="text/css">
+        .scale-note {
+            display: inline-block;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+        }
+        .scale-note:hover {
+            border-color: #666;
+            cursor: pointer;
+        }
+        .scale-note.active {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-89847488-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <article>
+        <h1>Guitar scale builder</h1>
+        <section>
+            <p>This tool allows you to build your own guitar scale.<br/> Click on the notes to change the current scale. Active notes have a light green background.</p>
+        </section>
+        <div class="scale-picker">
+            <div class="scale-note" data-note="c">c</div>
+            <div class="scale-note" data-note="c#">c#</div>
+            <div class="scale-note" data-note="d">d</div>
+            <div class="scale-note" data-note="d#">d#</div>
+            <div class="scale-note" data-note="e">e</div>
+            <div class="scale-note" data-note="f">f</div>
+            <div class="scale-note" data-note="f#">f#</div>
+            <div class="scale-note" data-note="g">g</div>
+            <div class="scale-note" data-note="g#">g#</div>
+            <div class="scale-note" data-note="a">a</div>
+            <div class="scale-note" data-note="a#">a#</div>
+            <div class="scale-note" data-note="b">b</div>
+        </div>
+
+        <pre id="board"></pre>
+    </article>
+
+    <script type="text/javascript">
+        function getAttr(e, name) {
+            return e.dataset[name];
+        }
+
+        function addClass(e, className) {
+            e.classList.add(className);
+        }
+
+        function hasClass(e, className) {
+            return e.classList.contains(className);
+        }
+
+        function toggleClass(e, className) {
+            return e.classList.toggle(className);
+        }
+
+        function removeClass(e, className) {
+            return e.classList.remove(className);
+        }
+
+        var noteElems = document.querySelectorAll('.scale-note');
+
+        function getScaleFromDom() {
+            var out = [];
+
+            for (var i = 0; i < noteElems.length; i++) {
+                var n = getAttr(noteElems[i], 'note');
+
+                if (hasClass(noteElems[i], 'active')) {
+                    out.push(n);
+                }
+
+            }
+            return out;
+        }
+
+        function setScale(scale) {
+
+            for (var i = 0; i < noteElems.length; i++) {
+                var e = noteElems[i];
+                var n = getAttr(e, 'note');
+
+                if (scale.indexOf(n) !== -1 && hasClass(e, 'active') === false) {
+                    addClass(e, 'active');
+                } else {
+                    removeClass(e, 'active');
+                }
+            }
+        }
+
+        function saveScaleAsFragment(scale) {
+            var frag = encodeURIComponent(scale.join('-').replace(/#/g, 's'));
+            history.replaceState(null, 'Guitar scale builder - ' + scale.join(' '), '#' + frag);
+        }
+
+        function getScaleFromFragment(frag) {
+            if (frag.length === 0) {
+                return false;
+            }
+            var pureFrag = frag.substring(1, frag.length);
+            if (pureFrag.length === 0) {
+                return [];
+            }
+
+            return pureFrag.replace(/s/g, '#').split('-');
+        }
+
+        // setup click handler for notes
+        for (var i = 0; i < noteElems.length; i++) {
+            (function() {
+                var e = noteElems[i];
+                e.addEventListener('click', function() {
+                    toggleClass(e, 'active');
+                    var scale = getScaleFromDom();
+                    saveScaleAsFragment(scale);
+                    renderAscii(scale);
+                });
+            })();
+        }
+
+
+        var fragScale = getScaleFromFragment(window.location.hash);
+
+        var initialScale = fragScale ? fragScale : ['e', 'f', 'g#', 'a', 'b', 'c', 'd'];
+        setScale(initialScale);
+        renderAscii(initialScale);
+
+
+        function renderAscii(initialScale) {
+
+            var notes = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+
+            // var scale = ['e', 'g', 'a', 'b', 'd', 'f', 'c'];
+            var scale = initialScale;
+            var strings = ['e', 'b', 'g', 'd', 'a', 'e'];
+            var count = 16;
+
+            // scale [0 - 11]
+            function getScale(baseNote, count, scale) {
+
+                // basenote index
+                var baseNoteIndex = notes.indexOf(baseNote);
+
+                if (baseNoteIndex === -1) {
+                    throw new Error('invalid baseNote');
+                }
+
+                var out = [];
+
+                for (var i = 0; i < count; i++) {
+
+                    // is the current note in the scale
+                    var note = notes[(baseNoteIndex + i) % notes.length];
+
+                    if (scale.indexOf(note) !== -1) {
+                        out.push(note);
+                    } else {
+                        out.push(false);
+                    }
+                }
+
+                return out;
+            }
+
+
+            var q = strings.map(function(k) {
+                return getScale(k, count, scale);
+            });
+
+            var board = '';
+            for (var i = 0; i < q.length; i++) {
+                var line = strings[i] + '|';
+
+                for (var j = 0; j < q[i].length; j++) {
+
+                    if (q[i][j]) {
+                        line += ' | o';
+                    } else {
+                        line += ' |  ';
+                    }
+                }
+
+                board += line + '\n';
+            }
+
+            var num = '  ';
+            for (var i = 0; i < count; i++) {
+                if (i === 3 || i === 5 || i === 7 || i === 9 || i === 12) {
+                    num += ' | *';
+                } else {
+                    num += ' |  ';
+                }
+            }
+
+            board += '\n' + num;
+
+            var el = document.getElementById('board');
+
+            el.innerHTML = board;
+        }
+    </script>
+</body>
+
+</html>
